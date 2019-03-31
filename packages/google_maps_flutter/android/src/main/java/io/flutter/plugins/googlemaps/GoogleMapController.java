@@ -134,8 +134,8 @@ final class GoogleMapController
     googleMap.moveCamera(cameraUpdate);
   }
 
-  private void animateCamera(CameraUpdate cameraUpdate) {
-    googleMap.animateCamera(cameraUpdate);
+  private void animateCamera(CameraUpdate cameraUpdate, int duration) {
+    googleMap.animateCamera(cameraUpdate, duration, null);
   }
 
   private CameraPosition getCameraPosition() {
@@ -157,6 +157,11 @@ final class GoogleMapController
     updateMyLocationEnabled();
     markersController.setGoogleMap(googleMap);
     updateInitialMarkers();
+    googleMap.getUiSettings().setZoomControlsEnabled(false);
+    googleMap.getUiSettings().setCompassEnabled(false);
+    googleMap.getUiSettings().setIndoorLevelPickerEnabled(false);
+    googleMap.getUiSettings().setMapToolbarEnabled(false);
+    googleMap.getUiSettings().setMyLocationButtonEnabled(false);
   }
 
   @Override
@@ -187,7 +192,8 @@ final class GoogleMapController
         {
           final CameraUpdate cameraUpdate =
               Convert.toCameraUpdate(call.argument("cameraUpdate"), density);
-          animateCamera(cameraUpdate);
+          final int duration = (int) call.argument("duration");
+          animateCamera(cameraUpdate, duration);
           result.success(null);
           break;
         }
