@@ -340,10 +340,34 @@ class _GoogleMapOptions {
     return optionsMap;
   }
 
-  Map<String, dynamic> updatesMap(_GoogleMapOptions newOptions) {
-    final Map<String, dynamic> prevOptionsMap = toMap();
+  Map<String, dynamic> toObjectMap() {
+    final Map<String, dynamic> optionsMap = <String, dynamic>{};
 
-    return newOptions.toMap()
+    void addIfNonNull(String fieldName, dynamic value) {
+      if (value != null) {
+        optionsMap[fieldName] = value;
+      }
+    }
+
+    addIfNonNull('compassEnabled', compassEnabled);
+    addIfNonNull('cameraTargetBounds', cameraTargetBounds);
+    addIfNonNull('mapType', mapType?.index);
+    addIfNonNull('minMaxZoomPreference', minMaxZoomPreference);
+    addIfNonNull('rotateGesturesEnabled', rotateGesturesEnabled);
+    addIfNonNull('scrollGesturesEnabled', scrollGesturesEnabled);
+    addIfNonNull('tiltGesturesEnabled', tiltGesturesEnabled);
+    addIfNonNull('zoomGesturesEnabled', zoomGesturesEnabled);
+    addIfNonNull('trackCameraPosition', trackCameraPosition);
+    addIfNonNull('myLocationEnabled', myLocationEnabled);
+
+    addIfNonNull('mapStyle', mapStyle);
+    return optionsMap;
+  }
+
+  Map<String, dynamic> updatesMap(_GoogleMapOptions newOptions) {
+    final Map<String, dynamic> prevOptionsMap = toObjectMap();
+
+    return newOptions.toObjectMap()
       ..removeWhere(
           (String key, dynamic value) => prevOptionsMap[key] == value);
   }
