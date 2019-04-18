@@ -30,6 +30,7 @@ class GoogleMap extends StatefulWidget {
     this.tiltGesturesEnabled = true,
     this.myLocationEnabled = false,
     this.markers,
+    this.polylines,
     this.onCameraMoveStarted,
     this.onCameraMove,
     this.onCameraIdle,
@@ -71,6 +72,9 @@ class GoogleMap extends StatefulWidget {
 
   /// Markers to be placed on the map.
   final Set<Marker> markers;
+
+  /// Polylines to be placed on the map.
+  final Set<Polyline> polylines;
 
   /// Called when the camera starts moving.
   ///
@@ -165,6 +169,7 @@ class _GoogleMapState extends State<GoogleMap> {
       Completer<GoogleMapController>();
 
   Map<MarkerId, Marker> _markers = <MarkerId, Marker>{};
+  Map<PolylineId, Polyline> _polylines = <PolylineId, Polyline>{};
   _GoogleMapOptions _googleMapOptions;
 
   @override
@@ -173,6 +178,7 @@ class _GoogleMapState extends State<GoogleMap> {
       'initialCameraPosition': widget.initialCameraPosition?._toMap(),
       'options': _googleMapOptions.toMap(),
       'markersToAdd': _serializeMarkerSet(widget.markers),
+      'polylinesToAdd': _serializePolylineSet(widget.polylines),
     };
     if (defaultTargetPlatform == TargetPlatform.android) {
       return AndroidView(
@@ -201,6 +207,7 @@ class _GoogleMapState extends State<GoogleMap> {
     super.initState();
     _googleMapOptions = _GoogleMapOptions.fromWidget(widget);
     _markers = _keyByMarkerId(widget.markers);
+    _polylines = _keyByPolylineId(widget.polylines);
   }
 
   @override
@@ -208,6 +215,7 @@ class _GoogleMapState extends State<GoogleMap> {
     super.didUpdateWidget(oldWidget);
     _updateOptions();
     _updateMarkers();
+    _updatePolylines();
   }
 
   void _updateOptions() async {
@@ -229,6 +237,13 @@ class _GoogleMapState extends State<GoogleMap> {
     _markers = _keyByMarkerId(widget.markers);
   }
 
+  void _updatePolylines() async {
+    final GoogleMapController controller = await _controller.future;
+    controller._updatePolylines(
+        _PolylineUpdates.from(_polylines.values.toSet(), widget.polylines));
+    _polylines = _keyByPolylineId(widget.polylines);
+  }
+
   Future<void> onPlatformViewCreated(int id) async {
     final GoogleMapController controller = await GoogleMapController.init(
       id,
@@ -245,6 +260,12 @@ class _GoogleMapState extends State<GoogleMap> {
     assert(markerIdParam != null);
     final MarkerId markerId = MarkerId(markerIdParam);
     _markers[markerId].onTap();
+  }
+
+  void onPolylineTap(String polylineIdParam) {
+    assert(polylineIdParam != null);
+    final PolylineId polylineId = PolylineId(polylineIdParam);
+    _polylines[polylineId].onTap();
   }
 
   void onInfoWindowTap(String markerIdParam) {
