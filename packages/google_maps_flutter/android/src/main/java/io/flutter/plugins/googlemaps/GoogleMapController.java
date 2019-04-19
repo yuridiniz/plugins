@@ -35,6 +35,8 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.platform.PlatformView;
+import onibus.OnibusInfoWindow;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -156,7 +158,7 @@ final class GoogleMapController
   @Override
   public void onMapReady(GoogleMap googleMap) {
     this.googleMap = googleMap;
-    googleMap.setOnInfoWindowClickListener(this);
+    //googleMap.setOnInfoWindowClickListener(this);
     if (mapReadyResult != null) {
       mapReadyResult.success(null);
       mapReadyResult = null;
@@ -167,6 +169,7 @@ final class GoogleMapController
     googleMap.setOnMarkerClickListener(this);
     googleMap.setOnPolylineClickListener(this);
     googleMap.setOnMapClickListener(this);
+    googleMap.setInfoWindowAdapter(new OnibusInfoWindow(this.context));
     updateMyLocationEnabled();
     markersController.setGoogleMap(googleMap);
     polylinesController.setGoogleMap(googleMap);
