@@ -36,6 +36,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.platform.PlatformView;
 import onibus.OnibusInfoWindow;
+import onibus.OnibusMarkerClick;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -166,7 +167,7 @@ final class GoogleMapController
     googleMap.setOnCameraMoveStartedListener(this);
     googleMap.setOnCameraMoveListener(this);
     googleMap.setOnCameraIdleListener(this);
-    googleMap.setOnMarkerClickListener(this);
+    googleMap.setOnMarkerClickListener(new OnibusMarkerClick());
     googleMap.setOnPolylineClickListener(this);
     googleMap.setOnMapClickListener(this);
     googleMap.setInfoWindowAdapter(new OnibusInfoWindow(this.context));
