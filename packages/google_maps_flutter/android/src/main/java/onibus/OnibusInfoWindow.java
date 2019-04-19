@@ -66,10 +66,22 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
         TextView carro = view.findViewById(R.id.txt_carro);
         TextView velocidade = view.findViewById(R.id.txt_velocidade);
         TextView time = view.findViewById(R.id.txt_time);
+        TextView gpsOff = view.findViewById(R.id.gps_fora_alcance);
+        TextView semLinha = view.findViewById(R.id.gps_sem_linha);
 
         try {
             JSONObject jsonObject = new JSONObject(marker.getSnippet());
-            linha.setText(jsonObject.getString("l"));
+            String linhaMarker = jsonObject.getString("l");
+
+            if(!linhaMarker.isEmpty()) {
+                linha.setText(linhaMarker);
+            } else {
+                semLinha.setVisibility(View.VISIBLE);
+
+                //Adiciona um espaço
+                gpsOff.setVisibility(View.INVISIBLE);
+            }
+
             carro.setText(jsonObject.getString("c"));
             velocidade.setText(jsonObject.getString("v"));
 
@@ -83,6 +95,12 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
             if(calendar.get(Calendar.HOUR_OF_DAY) > 23 || calendar.get(Calendar.DAY_OF_MONTH) > 1) {
                 time.setText(formatterDays(calendar), TextView.BufferType.SPANNABLE);
             } else if(calendar.get(Calendar.HOUR_OF_DAY) > 0 ) {
+                gpsOff.setVisibility(View.VISIBLE);
+                if(semLinha.getVisibility() == View.VISIBLE) {
+                    //Adiciona um "espaço"
+                    semLinha.setVisibility(View.INVISIBLE);
+                }
+
                 time.setText(formatterOnlyHours(calendar), TextView.BufferType.SPANNABLE);
             } else if(calendar.get(Calendar.MINUTE) > 0 ) {
                 time.setText(formatterMinuteAndSecounds(calendar), TextView.BufferType.SPANNABLE);
@@ -102,9 +120,11 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
 
         String[] strDateTokens = strDate.split(":");
         List<String> lstTokens = new ArrayList<>(Arrays.asList(strDateTokens));
-        lstTokens.add(" horas");
 
-        String finalText = strDate + " horas";
+        String finalToken = " hora" + (date.get(Calendar.SECOND) > 1 ? "s" : "");
+        lstTokens.add(finalToken); //Plural
+
+        String finalText = strDate + finalToken;
         SpannableString spanString = new SpannableString(finalText);
 
         int sizePrimary = (int) convertDpToPixel(20);
@@ -123,9 +143,11 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
 
         String[] strDateTokens = strDate.split(":");
         List<String> lstTokens = new ArrayList<>(Arrays.asList(strDateTokens));
-        lstTokens.add(" segundos");
 
-        String finalText = strDate + " segundos";
+        String finalToken = " segundo" + (date.get(Calendar.SECOND) > 1 ? "s" : "");
+        lstTokens.add(finalToken); //Plural
+
+        String finalText = strDate + finalToken;
         SpannableString spanString = new SpannableString(finalText);
 
         int sizePrimary = (int) convertDpToPixel(20);
@@ -164,9 +186,11 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
 
         String[] strDateTokens = strDate.split(":");
         List<String> lstTokens = new ArrayList<>(Arrays.asList(strDateTokens));
-        lstTokens.add(" hora(s)");
 
-        String finalText = strDate + " hora(s)";
+        String finalToken = " hora" + (date.get(Calendar.HOUR_OF_DAY) > 1 ? "s" : "");
+        lstTokens.add(finalToken); //Plural
+
+        String finalText = strDate + finalToken;
         SpannableString spanString = new SpannableString(finalText);
 
         int sizePrimary = (int) convertDpToPixel(20);
