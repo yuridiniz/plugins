@@ -1,6 +1,7 @@
 package onibus;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.text.Editable;
 import android.text.Html;
@@ -8,6 +9,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.style.AbsoluteSizeSpan;
+import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -96,7 +98,7 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
                 time.setText(formatterDays(calendar), TextView.BufferType.SPANNABLE);
             } else if(calendar.get(Calendar.HOUR_OF_DAY) > 0 ) {
                 gpsOff.setVisibility(View.VISIBLE);
-                if(semLinha.getVisibility() == View.VISIBLE) {
+                if(semLinha.getVisibility() == View.GONE) {
                     //Adiciona um "espaço"
                     semLinha.setVisibility(View.INVISIBLE);
                 }
@@ -121,7 +123,7 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
         String[] strDateTokens = strDate.split(":");
         List<String> lstTokens = new ArrayList<>(Arrays.asList(strDateTokens));
 
-        String finalToken = " hora" + (date.get(Calendar.SECOND) > 1 ? "s" : "");
+        String finalToken = " hora" + (date.get(Calendar.SECOND) > 1 ? "s" : "") + " atrás";
         lstTokens.add(finalToken); //Plural
 
         String finalText = strDate + finalToken;
@@ -134,6 +136,7 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
         //Hora
         spanString.setSpan(new AbsoluteSizeSpan(sizePrimary), finalText.indexOf(lstTokens.get(0)), finalText.indexOf(lstTokens.get(0)) + lstTokens.get(0).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         spanString.setSpan(new AbsoluteSizeSpan(sizeTerciary), finalText.indexOf(lstTokens.get(1)), finalText.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanString.setSpan(new ForegroundColorSpan(Color.parseColor("#303030")), finalText.indexOf(lstTokens.get(1)), finalText.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         return spanString;
     }
@@ -144,7 +147,7 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
         String[] strDateTokens = strDate.split(":");
         List<String> lstTokens = new ArrayList<>(Arrays.asList(strDateTokens));
 
-        String finalToken = " segundo" + (date.get(Calendar.SECOND) > 1 ? "s" : "");
+        String finalToken = " segundo" + (date.get(Calendar.SECOND) > 1 ? "s" : "") + " atrás";
         lstTokens.add(finalToken); //Plural
 
         String finalText = strDate + finalToken;
@@ -157,6 +160,7 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
         //Segundo
         spanString.setSpan(new AbsoluteSizeSpan(sizePrimary), finalText.indexOf(lstTokens.get(0)), finalText.indexOf(lstTokens.get(0)) + lstTokens.get(0).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         spanString.setSpan(new AbsoluteSizeSpan(sizeTerciary), finalText.indexOf(lstTokens.get(1)), finalText.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanString.setSpan(new ForegroundColorSpan(Color.parseColor("#303030")), finalText.indexOf(lstTokens.get(1)), finalText.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         return spanString;
     }
 
@@ -165,18 +169,24 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
 
         String[] strDateTokens = strDate.split(":");
         List<String> lstTokens = new ArrayList<>(Arrays.asList(strDateTokens));
-        SpannableString spanString = new SpannableString(strDate);
+        String finalToken = " atrás";
+        lstTokens.add(finalToken);
+
+        String finalText = strDate + finalToken;
+        SpannableString spanString = new SpannableString(finalText);
 
         int sizePrimary = (int) convertDpToPixel(20);
         int sizeSecondary = (int) convertDpToPixel(13);
         int sizeTerciary = (int) convertDpToPixel(10);
 
         //Minuto
-        spanString.setSpan(new AbsoluteSizeSpan(sizePrimary), strDate.indexOf(lstTokens.get(0)), strDate.indexOf(lstTokens.get(0)) + lstTokens.get(0).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spanString.setSpan(new AbsoluteSizeSpan(sizeSecondary), strDate.indexOf(lstTokens.get(0)) + lstTokens.get(0).length(), strDate.indexOf(lstTokens.get(0)) + lstTokens.get(0).length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanString.setSpan(new AbsoluteSizeSpan(sizePrimary), finalText.indexOf(lstTokens.get(0)), finalText.indexOf(lstTokens.get(0)) + lstTokens.get(0).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanString.setSpan(new AbsoluteSizeSpan(sizeSecondary), finalText.indexOf(lstTokens.get(0)) + lstTokens.get(0).length(), finalText.indexOf(lstTokens.get(0)) + lstTokens.get(0).length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         //Segundo
-        spanString.setSpan(new AbsoluteSizeSpan(sizePrimary), strDate.indexOf(lstTokens.get(1)), strDate.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanString.setSpan(new AbsoluteSizeSpan(sizePrimary), finalText.indexOf(lstTokens.get(1)), finalText.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        spanString.setSpan(new ForegroundColorSpan(Color.parseColor("#303030")), finalText.indexOf(lstTokens.get(2)), finalText.indexOf(lstTokens.get(2)) + lstTokens.get(2).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         return spanString;
     }
@@ -187,7 +197,7 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
         String[] strDateTokens = strDate.split(":");
         List<String> lstTokens = new ArrayList<>(Arrays.asList(strDateTokens));
 
-        String finalToken = " hora" + (date.get(Calendar.HOUR_OF_DAY) > 1 ? "s" : "");
+        String finalToken = " hora" + (date.get(Calendar.HOUR_OF_DAY) > 1 ? "s" : "") + " atrás";
         lstTokens.add(finalToken); //Plural
 
         String finalText = strDate + finalToken;
@@ -200,6 +210,7 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
         //Hora
         spanString.setSpan(new AbsoluteSizeSpan(sizePrimary), finalText.indexOf(lstTokens.get(0)), finalText.indexOf(lstTokens.get(0)) + lstTokens.get(0).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         spanString.setSpan(new AbsoluteSizeSpan(sizeTerciary), finalText.indexOf(lstTokens.get(1)), finalText.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanString.setSpan(new ForegroundColorSpan(Color.parseColor("#303030")), finalText.indexOf(lstTokens.get(1)), finalText.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         return spanString;
     }
