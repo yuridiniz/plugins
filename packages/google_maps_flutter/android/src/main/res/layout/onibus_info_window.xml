@@ -64,30 +64,40 @@
                 android:paddingTop="5dp"
                 android:paddingBottom="3dp">
 
+
                 <TextView
-                    android:id="@+id/txt_hora"
+                    android:id="@+id/txt_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="3"
                     android:textColor="#000"
                     android:textSize="20dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="1dp"
-                    android:layout_marginTop="2dp"
-                    android:text=":"
-                    android:textColor="#000"
-                    android:textSize="13dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="1dp"
-                    android:text="12"
-                    android:textColor="#000"
-                    android:textSize="20dp" />
+                <!--<TextView-->
+                    <!--android:id="@+id/txt_hora"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="3"-->
+                    <!--android:textColor="#000"-->
+                    <!--android:textSize="20dp" />-->
+
+                <!--<TextView-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginLeft="1dp"-->
+                    <!--android:layout_marginTop="2dp"-->
+                    <!--android:text=":"-->
+                    <!--android:textColor="#000"-->
+                    <!--android:textSize="13dp" />-->
+
+                <!--<TextView-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginLeft="1dp"-->
+                    <!--android:text="12"-->
+                    <!--android:textColor="#000"-->
+                    <!--android:textSize="20dp" />-->
 
                 <TextView
                     android:layout_width="wrap_content"

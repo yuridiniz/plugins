@@ -1,6 +1,14 @@
 package onibus;
 
 import android.content.Context;
+import android.os.Build;
+import android.text.Editable;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.style.AbsoluteSizeSpan;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -11,6 +19,13 @@ import com.google.android.gms.maps.model.Marker;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+
 import io.flutter.plugins.googlemaps.R;
 
 public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
@@ -20,6 +35,29 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
         this.context = context;
     }
 
+
+    /**
+     * This method converts dp unit to equivalent pixels, depending on device density.
+     *
+     * @param dp A value in dp (density independent pixels) unit. Which we need to convert into pixels
+     * @return A float value to represent px equivalent to dp depending on device density
+     */
+    public float convertDpToPixel(float dp){
+        return dp * ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    }
+
+    /**
+     * This method converts device specific pixels to density independent pixels.
+     *
+     * @param px A value in px (pixels) unit. Which we need to convert into db
+     * @return A float value to represent dp equivalent to px value
+     */
+    public float convertPixelstTokensoDp(float px){
+        return px / ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    }
+
+
+
     @Override
     public View getInfoWindow(Marker marker) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -27,18 +65,119 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
         TextView linha = view.findViewById(R.id.txt_linha);
         TextView carro = view.findViewById(R.id.txt_carro);
         TextView velocidade = view.findViewById(R.id.txt_velocidade);
+        TextView time = view.findViewById(R.id.txt_time);
 
         try {
             JSONObject jsonObject = new JSONObject(marker.getSnippet());
             linha.setText(jsonObject.getString("l"));
             carro.setText(jsonObject.getString("c"));
-            velocidade.setText(jsonObject.getInt("v") + "");
+            velocidade.setText(jsonObject.getString("v"));
 
-        } catch (JSONException e) {
+            long dateDiff = jsonObject.getLong("dataIncremental");
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(946692000000L); //2000-01-01 00:00:00
+
+            calendar.add(Calendar.MILLISECOND, (int) dateDiff);
+
+            if(calendar.get(Calendar.HOUR_OF_DAY) > 23 || calendar.get(Calendar.DAY_OF_MONTH) > 1) {
+                time.setText(formatterDays(calendar), TextView.BufferType.SPANNABLE);
+            } else if(calendar.get(Calendar.HOUR_OF_DAY) > 0 ) {
+                time.setText(formatterOnlyHours(calendar), TextView.BufferType.SPANNABLE);
+            } else if(calendar.get(Calendar.MINUTE) > 0 ) {
+                time.setText(formatterMinuteAndSecounds(calendar), TextView.BufferType.SPANNABLE);
+            } else {
+                time.setText(formatterOnlySecounds(calendar), TextView.BufferType.SPANNABLE);
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return view;
+    }
+
+    private SpannableString formatterDays(Calendar date) {
+        String strDate = new java.text.SimpleDateFormat("H").format(date.getTime());
+
+        String[] strDateTokens = strDate.split(":");
+        List<String> lstTokens = new ArrayList<>(Arrays.asList(strDateTokens));
+        lstTokens.add(" horas");
+
+        String finalText = strDate + " horas";
+        SpannableString spanString = new SpannableString(finalText);
+
+        int sizePrimary = (int) convertDpToPixel(20);
+        int sizeSecondary = (int) convertDpToPixel(13);
+        int sizeTerciary = (int) convertDpToPixel(10);
+
+        //Hora
+        spanString.setSpan(new AbsoluteSizeSpan(sizePrimary), finalText.indexOf(lstTokens.get(0)), finalText.indexOf(lstTokens.get(0)) + lstTokens.get(0).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanString.setSpan(new AbsoluteSizeSpan(sizeTerciary), finalText.indexOf(lstTokens.get(1)), finalText.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        return spanString;
+    }
+
+    private SpannableString formatterOnlySecounds(Calendar date) {
+        String strDate = new java.text.SimpleDateFormat("s").format(date.getTime());
+
+        String[] strDateTokens = strDate.split(":");
+        List<String> lstTokens = new ArrayList<>(Arrays.asList(strDateTokens));
+        lstTokens.add(" segundos");
+
+        String finalText = strDate + " segundos";
+        SpannableString spanString = new SpannableString(finalText);
+
+        int sizePrimary = (int) convertDpToPixel(20);
+        int sizeSecondary = (int) convertDpToPixel(13);
+        int sizeTerciary = (int) convertDpToPixel(10);
+
+        //Segundo
+        spanString.setSpan(new AbsoluteSizeSpan(sizePrimary), finalText.indexOf(lstTokens.get(0)), finalText.indexOf(lstTokens.get(0)) + lstTokens.get(0).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanString.setSpan(new AbsoluteSizeSpan(sizeTerciary), finalText.indexOf(lstTokens.get(1)), finalText.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return spanString;
+    }
+
+    private SpannableString formatterMinuteAndSecounds(Calendar date) {
+        String strDate = new java.text.SimpleDateFormat("m:ss").format(date.getTime());
+
+        String[] strDateTokens = strDate.split(":");
+        List<String> lstTokens = new ArrayList<>(Arrays.asList(strDateTokens));
+        SpannableString spanString = new SpannableString(strDate);
+
+        int sizePrimary = (int) convertDpToPixel(20);
+        int sizeSecondary = (int) convertDpToPixel(13);
+        int sizeTerciary = (int) convertDpToPixel(10);
+
+        //Minuto
+        spanString.setSpan(new AbsoluteSizeSpan(sizePrimary), strDate.indexOf(lstTokens.get(0)), strDate.indexOf(lstTokens.get(0)) + lstTokens.get(0).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanString.setSpan(new AbsoluteSizeSpan(sizeSecondary), strDate.indexOf(lstTokens.get(0)) + lstTokens.get(0).length(), strDate.indexOf(lstTokens.get(0)) + lstTokens.get(0).length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        //Segundo
+        spanString.setSpan(new AbsoluteSizeSpan(sizePrimary), strDate.indexOf(lstTokens.get(1)), strDate.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        return spanString;
+    }
+
+    private SpannableString formatterOnlyHours(Calendar date) {
+        String strDate = new java.text.SimpleDateFormat("H").format(date.getTime());
+
+        String[] strDateTokens = strDate.split(":");
+        List<String> lstTokens = new ArrayList<>(Arrays.asList(strDateTokens));
+        lstTokens.add(" hora(s)");
+
+        String finalText = strDate + " hora(s)";
+        SpannableString spanString = new SpannableString(finalText);
+
+        int sizePrimary = (int) convertDpToPixel(20);
+        int sizeSecondary = (int) convertDpToPixel(13);
+        int sizeTerciary = (int) convertDpToPixel(10);
+
+        //Hora
+        spanString.setSpan(new AbsoluteSizeSpan(sizePrimary), finalText.indexOf(lstTokens.get(0)), finalText.indexOf(lstTokens.get(0)) + lstTokens.get(0).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanString.setSpan(new AbsoluteSizeSpan(sizeTerciary), finalText.indexOf(lstTokens.get(1)), finalText.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        return spanString;
     }
 
     @Override
