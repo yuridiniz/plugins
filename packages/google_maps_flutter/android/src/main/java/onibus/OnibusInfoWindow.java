@@ -185,7 +185,7 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
 
         //Segundo
         spanString.setSpan(new AbsoluteSizeSpan(sizePrimary), finalText.indexOf(lstTokens.get(1)), finalText.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
+        spanString.setSpan(new AbsoluteSizeSpan(sizeTerciary), finalText.indexOf(lstTokens.get(2)), finalText.indexOf(lstTokens.get(2)) + lstTokens.get(2).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         spanString.setSpan(new ForegroundColorSpan(Color.parseColor("#303030")), finalText.indexOf(lstTokens.get(2)), finalText.indexOf(lstTokens.get(2)) + lstTokens.get(2).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         return spanString;
