@@ -81,6 +81,8 @@ final class GoogleMapController
   private String mapStyle = "";
   private List<Object> initialPolylines;
 
+  private OnibusMarkerClick onibusMarkerClick;
+
   GoogleMapController(
       int id,
       Context context,
@@ -99,6 +101,8 @@ final class GoogleMapController
     this.registrarActivityHashCode = registrar.activity().hashCode();
     this.markersController = new MarkersController(methodChannel);
     this.polylinesController = new PolylinesController(methodChannel);
+
+    this.onibusMarkerClick = new OnibusMarkerClick();
   }
 
   @Override
@@ -167,7 +171,7 @@ final class GoogleMapController
     googleMap.setOnCameraMoveStartedListener(this);
     googleMap.setOnCameraMoveListener(this);
     googleMap.setOnCameraIdleListener(this);
-    googleMap.setOnMarkerClickListener(new OnibusMarkerClick());
+    googleMap.setOnMarkerClickListener(onibusMarkerClick);
     googleMap.setOnPolylineClickListener(this);
     googleMap.setOnMapClickListener(this);
     googleMap.setInfoWindowAdapter(new OnibusInfoWindow(this.context));
@@ -366,6 +370,8 @@ final class GoogleMapController
     if (disposed || activity.hashCode() != registrarActivityHashCode) {
       return;
     }
+
+    onibusMarkerClick.onRemuse();
     mapView.onResume();
   }
 
@@ -374,6 +380,8 @@ final class GoogleMapController
     if (disposed || activity.hashCode() != registrarActivityHashCode) {
       return;
     }
+
+    onibusMarkerClick.onPause();
     mapView.onPause();
   }
 

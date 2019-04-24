@@ -87,7 +87,7 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
             carro.setText(jsonObject.getString("c"));
             velocidade.setText(jsonObject.getString("v"));
 
-            long dateDiff = jsonObject.getLong("dataIncremental");
+            long dateDiff = Calendar.getInstance().getTimeInMillis() - jsonObject.getLong("D");
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(946692000000L); //2000-01-01 00:00:00

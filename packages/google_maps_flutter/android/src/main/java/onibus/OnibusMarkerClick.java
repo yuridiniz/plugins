@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
@@ -21,14 +22,34 @@ public class OnibusMarkerClick implements GoogleMap.OnMarkerClickListener {
 
     private final Handler mHandler;
     private Runnable mAnimation;
-    private Runnable mTimeUpdate;
+    private TimeUpdate mTimeUpdate;
+    private Marker lastMarker;
 
     public OnibusMarkerClick() {
         mHandler = new Handler();
     }
 
+    public void onPause() {
+        if(mAnimation == null || mTimeUpdate == null)
+            return;
+
+        mHandler.removeCallbacks(mAnimation);
+        mHandler.removeCallbacks(mTimeUpdate);
+    }
+
+    public void onRemuse() {
+        if(mAnimation == null || mTimeUpdate == null)
+            return;
+
+        if(lastMarker != null && lastMarker.isInfoWindowShown()) {
+            lastMarker.showInfoWindow();
+            mHandler.postDelayed(mTimeUpdate, mTimeUpdate.getNextDelay());
+        }
+    }
+
     @Override
     public boolean onMarkerClick(final Marker marker) {
+        this.lastMarker = marker;
         // This causes the marker at Perth to bounce into position when it is clicked.
         final long start = SystemClock.uptimeMillis();
         final long duration = 900L;
@@ -40,9 +61,11 @@ public class OnibusMarkerClick implements GoogleMap.OnMarkerClickListener {
         // Starts the bounce animation
         mAnimation = new OpenAnimation(start, duration, marker, mHandler);
         mTimeUpdate = new TimeUpdate(marker, mHandler);
-        mTimeUpdate.run();
 
-        mHandler.postDelayed(mTimeUpdate, 1000L);
+        Log.d("INIT", "INIT DELAY");
+
+        mHandler.postDelayed(mTimeUpdate, mTimeUpdate.getNextDelay());
+
         mHandler.post(mAnimation);
 
         // for the default behavior to occur (which is for the camera to move such that the
@@ -57,37 +80,38 @@ public class OnibusMarkerClick implements GoogleMap.OnMarkerClickListener {
 
         private final Marker mMarker;
         private final Handler mHandler;
-        private long dateForLastExecution;
+        private long lastExecute;
 
         private TimeUpdate(Marker marker, Handler handler) {
             mMarker = marker;
             mHandler = handler;
-            dateForLastExecution = 0;
+            lastExecute = 0;
         }
 
+        public long getNextDelay() {
+            if(lastExecute == 0) {
+                long milisParaProximoSegundo = Calendar.getInstance().getTimeInMillis() % 1000;
+                lastExecute = Calendar.getInstance().getTimeInMillis() - milisParaProximoSegundo;
+            }
+
+            long delayLastExecution = (Calendar.getInstance().getTimeInMillis() - lastExecute);
+            long delay = 1000L - delayLastExecution;
+            if(delay < 0)
+                delay = 0;
+
+            Log.d("DELAY", delay + "");
+            return delay;
+        }
 
         @Override
         public void run() {
-            try {
-                JSONObject json = new JSONObject(mMarker.getSnippet());
-                long date = json.getLong("D");
-                if(date != dateForLastExecution) {
-                    dateForLastExecution = date;
-                    long dateDiff = Calendar.getInstance().getTimeInMillis() - date;
-                    json.put("dataIncremental", dateDiff);
-                } else {
-                    json.put("dataIncremental", json.getLong("dataIncremental") + 1000);
-                }
+            mHandler.removeCallbacks(this);
 
-                mMarker.setSnippet(json.toString());
+            if (mMarker.isInfoWindowShown()) {
+                mMarker.showInfoWindow();
 
-                if (mMarker.isInfoWindowShown()) {
-                    mMarker.showInfoWindow();
-                    mHandler.postDelayed(this, 1000L);
-                }
-
-            } catch (JSONException e) {
-                e.printStackTrace();
+                mHandler.postDelayed(this, getNextDelay());
+                lastExecute = Calendar.getInstance().getTimeInMillis();
             }
         }
     }
