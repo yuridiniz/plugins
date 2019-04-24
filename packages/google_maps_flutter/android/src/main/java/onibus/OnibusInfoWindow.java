@@ -58,21 +58,25 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
         return px / ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 
-
-
     @Override
     public View getInfoWindow(Marker marker) {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.onibus_info_window, null);
-        TextView linha = view.findViewById(R.id.txt_linha);
-        TextView carro = view.findViewById(R.id.txt_carro);
-        TextView velocidade = view.findViewById(R.id.txt_velocidade);
-        TextView time = view.findViewById(R.id.txt_time);
-        TextView gpsOff = view.findViewById(R.id.gps_fora_alcance);
-        TextView semLinha = view.findViewById(R.id.gps_sem_linha);
-
         try {
             JSONObject jsonObject = new JSONObject(marker.getSnippet());
+            Calendar calendar = Calendar.getInstance();
+            long dateDiff = calendar.getTimeInMillis() - jsonObject.getLong("D");
+
+            calendar.setTimeInMillis(946692000000L); //2000-01-01 00:00:00
+            calendar.add(Calendar.MILLISECOND, (int) dateDiff);
+
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View view = inflater.inflate(R.layout.onibus_info_window, null);
+            TextView linha = view.findViewById(R.id.txt_linha);
+            TextView carro = view.findViewById(R.id.txt_carro);
+            TextView velocidade = view.findViewById(R.id.txt_velocidade);
+            TextView time = view.findViewById(R.id.txt_time);
+            TextView gpsOff = view.findViewById(R.id.gps_fora_alcance);
+            TextView semLinha = view.findViewById(R.id.gps_sem_linha);
+
             String linhaMarker = jsonObject.getString("l");
 
             if(!linhaMarker.isEmpty()) {
@@ -87,12 +91,6 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
             carro.setText(jsonObject.getString("c"));
             velocidade.setText(jsonObject.getString("v"));
 
-            long dateDiff = Calendar.getInstance().getTimeInMillis() - jsonObject.getLong("D");
-
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(946692000000L); //2000-01-01 00:00:00
-
-            calendar.add(Calendar.MILLISECOND, (int) dateDiff);
 
             if(calendar.get(Calendar.HOUR_OF_DAY) > 23 || calendar.get(Calendar.DAY_OF_MONTH) > 1) {
                 time.setText(formatterDays(calendar), TextView.BufferType.SPANNABLE);
@@ -110,11 +108,13 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
                 time.setText(formatterOnlySecounds(calendar), TextView.BufferType.SPANNABLE);
             }
 
+            return view;
+
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
 
-        return view;
     }
 
     private SpannableString formatterDays(Calendar date) {
