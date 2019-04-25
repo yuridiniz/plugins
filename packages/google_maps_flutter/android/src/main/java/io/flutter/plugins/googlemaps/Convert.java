@@ -20,10 +20,14 @@ import com.google.android.gms.maps.model.Dot;
 import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.RoundCap;
 import com.google.android.gms.maps.model.SquareCap;
 import io.flutter.view.FlutterMain;
+import onibus.Animation.LatLngInterpolator;
+import onibus.Animation.MarkerAnimation;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -318,11 +322,21 @@ class Convert {
     }
     final Object position = data.get("position");
     if (position != null) {
-      sink.setPosition(toLatLng(position));
+      Marker marker = sink.getMarker();
+
+      if(marker != null)
+        MarkerAnimation.animateMarkerToICS(marker, toLatLng(position), new LatLngInterpolator.Spherical());
+      else
+        sink.setPosition(toLatLng(position));
     }
     final Object rotation = data.get("rotation");
     if (rotation != null) {
-      sink.setRotation(toFloat(rotation));
+      Marker marker = sink.getMarker();
+
+      if(marker != null)
+        MarkerAnimation.animateMarkerRotationICS(marker, toFloat(rotation));
+      else
+        sink.setRotation(toFloat(rotation));
     }
     final Object visible = data.get("visible");
     if (visible != null) {

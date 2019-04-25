@@ -6,6 +6,7 @@ package io.flutter.plugins.googlemaps;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 /** Receiver of Marker configuration options. */
 interface MarkerOptionsSink {
@@ -32,4 +33,6 @@ interface MarkerOptionsSink {
   void setVisible(boolean visible);
 
   void setZIndex(float zIndex);
+
+  Marker getMarker();
 }

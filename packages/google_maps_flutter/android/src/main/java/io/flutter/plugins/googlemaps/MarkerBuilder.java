@@ -6,6 +6,7 @@ package io.flutter.plugins.googlemaps;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 class MarkerBuilder implements MarkerOptionsSink {
@@ -84,4 +85,7 @@ class MarkerBuilder implements MarkerOptionsSink {
   public void setZIndex(float zIndex) {
     markerOptions.zIndex(zIndex);
   }
+
+    @Override
+  public Marker getMarker() { return null; }
 }

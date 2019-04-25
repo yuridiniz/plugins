@@ -93,4 +93,9 @@ class MarkerController implements MarkerOptionsSink {
   boolean consumeTapEvents() {
     return consumeTapEvents;
   }
+
+    @Override
+   public Marker getMarker() {
+        return marker;
+    }
 }
