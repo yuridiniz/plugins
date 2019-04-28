@@ -69,6 +69,7 @@ final class GoogleMapController
   private GoogleMap googleMap;
   private boolean trackCameraPosition = false;
   private boolean myLocationEnabled = false;
+  private boolean trafficEnabled = false;
   private boolean disposed = false;
   private final float density;
   private MethodChannel.Result mapReadyResult;
@@ -481,6 +482,17 @@ final class GoogleMapController
     this.myLocationEnabled = myLocationEnabled;
     if (googleMap != null) {
       updateMyLocationEnabled();
+    }
+  }
+
+  @Override
+  public void setTrafficEnabled(boolean trafficEnabled) {
+    if (this.trafficEnabled == trafficEnabled) {
+      return;
+    }
+    this.trafficEnabled = trafficEnabled;
+    if (googleMap != null) {
+      googleMap.setTrafficEnabled(trafficEnabled);
     }
   }
 

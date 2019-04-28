@@ -36,6 +36,7 @@ class GoogleMap extends StatefulWidget {
     this.onCameraIdle,
     this.onTap,
     this.mapStyle,
+    this.trafficEnabled
   })  : assert(initialCameraPosition != null),
         super(key: key);
 
@@ -148,6 +149,8 @@ class GoogleMap extends StatefulWidget {
   ///
   ///
   final String mapStyle;
+
+  final bool trafficEnabled;
 
   /// Which gestures should be consumed by the map.
   ///
@@ -297,6 +300,7 @@ class _GoogleMapOptions {
     this.zoomGesturesEnabled,
     this.myLocationEnabled,
     this.mapStyle,
+    this.trafficEnabled,
   });
 
   static _GoogleMapOptions fromWidget(GoogleMap map) {
@@ -312,6 +316,7 @@ class _GoogleMapOptions {
       zoomGesturesEnabled: map.zoomGesturesEnabled,
       myLocationEnabled: map.myLocationEnabled,
       mapStyle: map.mapStyle,
+      trafficEnabled: map.trafficEnabled,
     );
   }
 
@@ -337,6 +342,8 @@ class _GoogleMapOptions {
 
   final String mapStyle;
 
+  final bool trafficEnabled;
+
   Map<String, dynamic> toMap() {
     final Map<String, dynamic> optionsMap = <String, dynamic>{};
 
@@ -358,6 +365,8 @@ class _GoogleMapOptions {
     addIfNonNull('myLocationEnabled', myLocationEnabled);
 
     addIfNonNull('mapStyle', mapStyle);
+    addIfNonNull('trafficEnabled', trafficEnabled);
+
     return optionsMap;
   }
 
@@ -382,6 +391,8 @@ class _GoogleMapOptions {
     addIfNonNull('myLocationEnabled', myLocationEnabled);
 
     addIfNonNull('mapStyle', mapStyle);
+    addIfNonNull('trafficEnabled', trafficEnabled);
+
     return optionsMap;
   }
 

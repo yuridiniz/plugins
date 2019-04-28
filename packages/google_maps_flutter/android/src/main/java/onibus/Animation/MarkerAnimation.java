@@ -1,5 +1,6 @@
 package onibus.Animation;
 
+import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
@@ -15,7 +16,11 @@ import android.view.animation.LinearInterpolator;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import java.util.HashMap;
+
 public class MarkerAnimation {
+    private static HashMap<String, ObjectAnimator> rotateAnimation = new HashMap<>();
+    private static HashMap<String, ObjectAnimator> latLngAnimate = new HashMap<>();
 
     public static void animateMarkerToGB(final Marker marker, final LatLng finalPosition, final LatLngInterpolator latLngInterpolator) {
         final LatLng startPosition = marker.getPosition();
@@ -68,6 +73,7 @@ public class MarkerAnimation {
                     // Post again 16ms later.
                     handler.postDelayed(this, 16);
                 } else {
+
                 }
             }
         });
@@ -93,6 +99,14 @@ public class MarkerAnimation {
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static void animateMarkerRotationHC(final Marker marker, final float toRotation) {
+        if(rotateAnimation.containsKey(marker.getId())) {
+            ObjectAnimator _animator = rotateAnimation.get(marker.getId());
+            if(_animator.isRunning()) {
+                _animator.cancel();
+            }
+
+            rotateAnimation.remove(marker.getId());
+        }
 
         final float startRotation = marker.getRotation();
         final Interpolator interpolator = new LinearInterpolator();
@@ -114,6 +128,15 @@ public class MarkerAnimation {
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static void animateMarkerRotationICS(final Marker marker, final float toRotation) {
+        if(rotateAnimation.containsKey(marker.getId())) {
+            ObjectAnimator _animator = rotateAnimation.get(marker.getId());
+            if(_animator.isRunning()) {
+                _animator.cancel();
+            }
+
+            rotateAnimation.remove(marker.getId());
+        }
+
         final Interpolator interpolator = new LinearInterpolator();
 
         TypeEvaluator<Float> typeEvaluator = new TypeEvaluator<Float>() {
@@ -127,11 +150,46 @@ public class MarkerAnimation {
         Property<Marker, Float> property = Property.of(Marker.class, Float.class, "rotation");
         ObjectAnimator animator = ObjectAnimator.ofObject(marker, property, typeEvaluator, toRotation);
         animator.setDuration(800);
+        animator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if(rotateAnimation.containsKey(marker.getId())) {
+                    rotateAnimation.remove(marker.getId());
+                }
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
         animator.start();
+
+        rotateAnimation.put(marker.getId(), animator);
+
     }
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    public static void animateMarkerToICS(Marker marker, LatLng finalPosition, final LatLngInterpolator latLngInterpolator) {
+    public static void animateMarkerToICS(final Marker marker, LatLng finalPosition, final LatLngInterpolator latLngInterpolator) {
+        if(latLngAnimate.containsKey(marker.getId())) {
+            ObjectAnimator _animator = latLngAnimate.get(marker.getId());
+            if(_animator.isRunning()) {
+                _animator.cancel();
+            }
+
+            latLngAnimate.remove(marker.getId());
+        }
+
         TypeEvaluator<LatLng> typeEvaluator = new TypeEvaluator<LatLng>() {
             @Override
             public LatLng evaluate(float fraction, LatLng startValue, LatLng endValue) {
@@ -140,7 +198,32 @@ public class MarkerAnimation {
         };
         Property<Marker, LatLng> property = Property.of(Marker.class, LatLng.class, "position");
         ObjectAnimator animator = ObjectAnimator.ofObject(marker, property, typeEvaluator, finalPosition);
+        animator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if(latLngAnimate.containsKey(marker.getId())) {
+                    latLngAnimate.remove(marker.getId());
+                }
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
         animator.setDuration(3000);
         animator.start();
+
+        latLngAnimate.put(marker.getId(), animator);
     }
 }

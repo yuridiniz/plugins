@@ -285,6 +285,10 @@ class Convert {
     if (myLocationEnabled != null) {
       sink.setMyLocationEnabled(toBoolean(myLocationEnabled));
     }
+    final Object trafficEnabled = data.get("trafficEnabled");
+    if (trafficEnabled != null) {
+      sink.setTrafficEnabled(toBoolean(trafficEnabled));
+    }
   }
 
   /** Returns the dartMarkerId of the interpreted marker. */
@@ -324,19 +328,27 @@ class Convert {
     if (position != null) {
       Marker marker = sink.getMarker();
 
-      if(marker != null)
-        MarkerAnimation.animateMarkerToICS(marker, toLatLng(position), new LatLngInterpolator.Spherical());
-      else
+      if(marker != null && marker.getPosition() != null) {
+        if(!marker.getPosition().equals(toLatLng(position))) {
+          MarkerAnimation.animateMarkerToICS(marker, toLatLng(position), new LatLngInterpolator.Spherical());
+        }
+      }
+      else {
         sink.setPosition(toLatLng(position));
+      }
     }
     final Object rotation = data.get("rotation");
     if (rotation != null) {
       Marker marker = sink.getMarker();
 
-      if(marker != null)
-        MarkerAnimation.animateMarkerRotationICS(marker, toFloat(rotation));
-      else
+      if(marker != null) {
+        if(marker.getRotation() != toFloat(rotation)) {
+          MarkerAnimation.animateMarkerRotationICS(marker, toFloat(rotation));
+        }
+      }
+      else {
         sink.setRotation(toFloat(rotation));
+      }
     }
     final Object visible = data.get("visible");
     if (visible != null) {
