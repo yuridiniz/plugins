@@ -238,7 +238,7 @@ class _GoogleMapState extends State<GoogleMap> {
     var _result = _MarkerUpdates.from(_markers.values.toSet(), widget.markers);
     if(_result.markerIdsToRemove.isEmpty 
     && _result.markersToAdd.isEmpty
-    && _result.markersToAdd.isEmpty) {
+    && _result.markersToChange.isEmpty) {
       return;
     }
 
