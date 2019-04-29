@@ -235,15 +235,27 @@ class _GoogleMapState extends State<GoogleMap> {
 
   void _updateMarkers() async {
     final GoogleMapController controller = await _controller.future;
-    controller._updateMarkers(
-        _MarkerUpdates.from(_markers.values.toSet(), widget.markers));
+    var _result = _MarkerUpdates.from(_markers.values.toSet(), widget.markers);
+    if(_result.markerIdsToRemove.isEmpty 
+    && _result.markersToAdd.isEmpty
+    && _result.markersToAdd.isEmpty) {
+      return;
+    }
+
+    controller._updateMarkers(_result);
     _markers = _keyByMarkerId(widget.markers);
   }
 
   void _updatePolylines() async {
     final GoogleMapController controller = await _controller.future;
-    controller._updatePolylines(
-        _PolylineUpdates.from(_polylines.values.toSet(), widget.polylines));
+    var _result = _PolylineUpdates.from(_polylines.values.toSet(), widget.polylines);
+    if(_result.polylineIdsToRemove.isEmpty 
+    && _result.polylinesToAdd.isEmpty
+    && _result.polylinesToChange.isEmpty) {
+      return;
+    }
+
+    controller._updatePolylines(_result);
     _polylines = _keyByPolylineId(widget.polylines);
   }
 

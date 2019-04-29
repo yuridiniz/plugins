@@ -18,7 +18,6 @@
         <!--whatever you want in the background, here i preferred solid white -->
         <shape android:shape="rectangle">
             <solid android:color="@android:color/white" />
-
         </shape>
     </item>
 </layer-list>
