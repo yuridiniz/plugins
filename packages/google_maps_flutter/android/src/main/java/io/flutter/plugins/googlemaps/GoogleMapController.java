@@ -69,11 +69,8 @@ final class GoogleMapController
   private GoogleMap googleMap;
   private boolean trackCameraPosition = false;
   private boolean myLocationEnabled = false;
-<<<<<<< HEAD
   private boolean trafficEnabled = false;
-=======
   private boolean myLocationButtonEnabled = false;
->>>>>>> 5ba657dc26eb9f0fde7e47b1577a5f5fd31c105c
   private boolean disposed = false;
   private final float density;
   private MethodChannel.Result mapReadyResult;

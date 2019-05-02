@@ -288,6 +288,7 @@ class Convert {
     final Object trafficEnabled = data.get("trafficEnabled");
     if (trafficEnabled != null) {
       sink.setTrafficEnabled(toBoolean(trafficEnabled));
+    }
     final Object myLocationButtonEnabled = data.get("myLocationButtonEnabled");
     if (myLocationButtonEnabled != null) {
       sink.setMyLocationButtonEnabled(toBoolean(myLocationButtonEnabled));

@@ -15,11 +15,8 @@ class GoogleMapBuilder implements GoogleMapOptionsSink {
   private final GoogleMapOptions options = new GoogleMapOptions();
   private boolean trackCameraPosition = false;
   private boolean myLocationEnabled = false;
-<<<<<<< HEAD
   private boolean trafficEnabled = false;
-=======
   private boolean myLocationButtonEnabled = false;
->>>>>>> 5ba657dc26eb9f0fde7e47b1577a5f5fd31c105c
   private Object initialMarkers;
   private String mapStyle = "";
   private Object initialPolylines;
