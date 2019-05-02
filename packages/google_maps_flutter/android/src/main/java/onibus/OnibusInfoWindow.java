@@ -92,16 +92,20 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
             velocidade.setText(jsonObject.getString("v"));
 
 
-            if(calendar.get(Calendar.HOUR_OF_DAY) > 23 || calendar.get(Calendar.DAY_OF_MONTH) > 1) {
-                time.setText(formatterDays(calendar), TextView.BufferType.SPANNABLE);
-            } else if(calendar.get(Calendar.HOUR_OF_DAY) > 0 ) {
+            if(calendar.get(Calendar.HOUR_OF_DAY) > 0 || calendar.get(Calendar.DAY_OF_MONTH) > 1) {
                 gpsOff.setVisibility(View.VISIBLE);
                 if(semLinha.getVisibility() == View.GONE) {
                     //Adiciona um "espaço"
                     semLinha.setVisibility(View.INVISIBLE);
                 }
 
-                time.setText(formatterOnlyHours(calendar), TextView.BufferType.SPANNABLE);
+                if(calendar.get(Calendar.DAY_OF_MONTH) > 1) {
+                    time.setText(formatterDays(calendar), TextView.BufferType.SPANNABLE);
+
+                } else {
+                    time.setText(formatterOnlyHours(calendar), TextView.BufferType.SPANNABLE);
+                }
+
             } else if(calendar.get(Calendar.MINUTE) > 0 ) {
                 time.setText(formatterMinuteAndSecounds(calendar), TextView.BufferType.SPANNABLE);
             } else {
@@ -118,25 +122,19 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
     }
 
     private SpannableString formatterDays(Calendar date) {
-        String strDate = new java.text.SimpleDateFormat("H").format(date.getTime());
+//        String strDate = new java.text.SimpleDateFormat("H").format(date.getTime());
+//
+//        String[] strDateTokens = strDate.split(":");
+        List<String> lstTokens = new ArrayList<>();
 
-        String[] strDateTokens = strDate.split(":");
-        List<String> lstTokens = new ArrayList<>(Arrays.asList(strDateTokens));
-
-        String finalToken = " hora" + (date.get(Calendar.SECOND) > 1 ? "s" : "") + " atrás";
+        String finalToken = "dias sem conexão";
         lstTokens.add(finalToken); //Plural
 
-        String finalText = strDate + finalToken;
+        String finalText = finalToken;
         SpannableString spanString = new SpannableString(finalText);
 
-        int sizePrimary = (int) convertDpToPixel(20);
-        int sizeSecondary = (int) convertDpToPixel(13);
-        int sizeTerciary = (int) convertDpToPixel(10);
-
-        //Hora
+        int sizePrimary = (int) convertDpToPixel(10);
         spanString.setSpan(new AbsoluteSizeSpan(sizePrimary), finalText.indexOf(lstTokens.get(0)), finalText.indexOf(lstTokens.get(0)) + lstTokens.get(0).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spanString.setSpan(new AbsoluteSizeSpan(sizeTerciary), finalText.indexOf(lstTokens.get(1)), finalText.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spanString.setSpan(new ForegroundColorSpan(Color.parseColor("#303030")), finalText.indexOf(lstTokens.get(1)), finalText.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         return spanString;
     }
