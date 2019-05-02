@@ -127,7 +127,9 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
 //        String[] strDateTokens = strDate.split(":");
         List<String> lstTokens = new ArrayList<>();
 
-        String finalToken = "dias sem conexão";
+        lstTokens.add("+24h"); //Plural
+
+        String finalToken = " sem sinal";
         lstTokens.add(finalToken); //Plural
 
         String finalText = finalToken;
@@ -135,6 +137,8 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
 
         int sizePrimary = (int) convertDpToPixel(10);
         spanString.setSpan(new AbsoluteSizeSpan(sizePrimary), finalText.indexOf(lstTokens.get(0)), finalText.indexOf(lstTokens.get(0)) + lstTokens.get(0).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanString.setSpan(new AbsoluteSizeSpan(sizePrimary), finalText.indexOf(lstTokens.get(1)), finalText.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanString.setSpan(new ForegroundColorSpan(Color.parseColor("#303030")), finalText.indexOf(lstTokens.get(1)), finalText.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         return spanString;
     }
