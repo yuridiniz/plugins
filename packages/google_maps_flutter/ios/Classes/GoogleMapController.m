@@ -179,6 +179,9 @@ static double ToDouble(NSNumber* data) { return [FLTGoogleMapJsonConversions toD
   } else if ([call.method isEqualToString:@"map#isScrollGesturesEnabled"]) {
     NSNumber* isScrollGesturesEnabled = @(_mapView.settings.scrollGestures);
     result(isScrollGesturesEnabled);
+  } else if ([call.method isEqualToString:@"map#isMyLocationButtonEnabled"]) {
+    NSNumber* isMyLocationButtonEnabled = @(_mapView.settings.myLocationButton);
+    result(isMyLocationButtonEnabled);
   } else {
     result(FlutterMethodNotImplemented);
   }
@@ -264,6 +267,10 @@ static double ToDouble(NSNumber* data) { return [FLTGoogleMapJsonConversions toD
     NSLog(@"The map style definition could not be loaded: %@", error);
   }
   _mapView.mapStyle = style;
+}
+
+- (void)setMyLocationButtonEnabled:(BOOL)enabled {
+  _mapView.settings.myLocationButton = enabled;
 }
 
 #pragma mark - GMSMapViewDelegate methods
@@ -520,5 +527,8 @@ static void interpretMarkerOptions(id json, id<FLTGoogleMapMarkerOptionsSink> si
   id zIndex = data[@"zIndex"];
   if (zIndex) {
     [sink setZIndex:ToInt(zIndex)];
+  NSNumber* myLocationButtonEnabled = data[@"myLocationButtonEnabled"];
+  if (myLocationButtonEnabled) {
+    [sink setMyLocationButtonEnabled:ToBool(myLocationButtonEnabled)];
   }
 }

@@ -29,6 +29,7 @@ class GoogleMap extends StatefulWidget {
     this.zoomGesturesEnabled = true,
     this.tiltGesturesEnabled = true,
     this.myLocationEnabled = false,
+    this.myLocationButtonEnabled = true,
     this.markers,
     this.polylines,
     this.onCameraMoveStarted,
@@ -151,6 +152,19 @@ class GoogleMap extends StatefulWidget {
   final String mapStyle;
 
   final bool trafficEnabled;
+  
+  /// Enables or disables the my-location button.
+  ///
+  /// The my-location button causes the camera to move such that the user's
+  /// location is in the center of the map. If the button is enabled, it is
+  /// only shown when the my-location layer is enabled.
+  ///
+  /// By default, the my-location button is enabled (and hence shown when the
+  /// my-location layer is enabled).
+  ///
+  /// See also:
+  ///   * [myLocationEnabled] parameter.
+  final bool myLocationButtonEnabled;
 
   /// Which gestures should be consumed by the map.
   ///
@@ -313,6 +327,7 @@ class _GoogleMapOptions {
     this.myLocationEnabled,
     this.mapStyle,
     this.trafficEnabled,
+    this.myLocationButtonEnabled,
   });
 
   static _GoogleMapOptions fromWidget(GoogleMap map) {
@@ -329,6 +344,7 @@ class _GoogleMapOptions {
       myLocationEnabled: map.myLocationEnabled,
       mapStyle: map.mapStyle,
       trafficEnabled: map.trafficEnabled,
+      myLocationButtonEnabled: map.myLocationButtonEnabled,
     );
   }
 
@@ -355,6 +371,8 @@ class _GoogleMapOptions {
   final String mapStyle;
 
   final bool trafficEnabled;
+  
+  final bool myLocationButtonEnabled;
 
   Map<String, dynamic> toMap() {
     final Map<String, dynamic> optionsMap = <String, dynamic>{};
@@ -375,6 +393,7 @@ class _GoogleMapOptions {
     addIfNonNull('zoomGesturesEnabled', zoomGesturesEnabled);
     addIfNonNull('trackCameraPosition', trackCameraPosition);
     addIfNonNull('myLocationEnabled', myLocationEnabled);
+    addIfNonNull('myLocationButtonEnabled', myLocationButtonEnabled);
 
     addIfNonNull('mapStyle', mapStyle);
     addIfNonNull('trafficEnabled', trafficEnabled);

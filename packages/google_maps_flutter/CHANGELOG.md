@@ -1,3 +1,15 @@
+## 0.5.11+1
+
+* Android: Fix an issue where myLocationButtonEnabled setting was not propagated when set to false onMapLoad.
+
+## 0.5.11
+
+* Add myLocationButtonEnabled option.
+
+## 0.5.10
+
+* Support Color's alpha channel when converting to UIColor on iOS.
+
 ## 0.5.9
 
 * BitmapDescriptor#fromBytes accounts for screen scale on ios.
