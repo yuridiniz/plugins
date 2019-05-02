@@ -127,17 +127,19 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
 //        String[] strDateTokens = strDate.split(":");
         List<String> lstTokens = new ArrayList<>();
 
-        lstTokens.add("+24h"); //Plural
+        String horas = "+24h";
+        lstTokens.add(horas); //Plural
 
         String finalToken = " sem sinal";
         lstTokens.add(finalToken); //Plural
 
-        String finalText = finalToken;
+        String finalText = horas + finalToken;
         SpannableString spanString = new SpannableString(finalText);
 
-        int sizePrimary = (int) convertDpToPixel(10);
+        int sizePrimary = (int) convertDpToPixel(14);
+        int sizeSecundary = (int) convertDpToPixel(10);
         spanString.setSpan(new AbsoluteSizeSpan(sizePrimary), finalText.indexOf(lstTokens.get(0)), finalText.indexOf(lstTokens.get(0)) + lstTokens.get(0).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spanString.setSpan(new AbsoluteSizeSpan(sizePrimary), finalText.indexOf(lstTokens.get(1)), finalText.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanString.setSpan(new AbsoluteSizeSpan(sizeSecundary), finalText.indexOf(lstTokens.get(1)), finalText.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         spanString.setSpan(new ForegroundColorSpan(Color.parseColor("#303030")), finalText.indexOf(lstTokens.get(1)), finalText.indexOf(lstTokens.get(1)) + lstTokens.get(1).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         return spanString;
