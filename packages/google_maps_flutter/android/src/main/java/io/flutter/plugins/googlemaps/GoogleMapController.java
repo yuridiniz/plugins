@@ -186,6 +186,8 @@ final class GoogleMapController
     googleMap.getUiSettings().setCompassEnabled(false);
     googleMap.getUiSettings().setIndoorLevelPickerEnabled(false);
     googleMap.getUiSettings().setMapToolbarEnabled(false);
+    googleMap.setMapStyle(new MapStyleOptions(mapStyle));
+
   }
 
   @Override
