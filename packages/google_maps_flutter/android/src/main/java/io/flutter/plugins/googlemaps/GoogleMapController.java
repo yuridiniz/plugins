@@ -17,6 +17,8 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -38,6 +40,11 @@ import io.flutter.plugin.platform.PlatformView;
 import onibus.OnibusInfoWindow;
 import onibus.OnibusMarkerClick;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -101,8 +108,30 @@ final class GoogleMapController
     this.registrarActivityHashCode = registrar.activity().hashCode();
     this.markersController = new MarkersController(methodChannel);
     this.polylinesController = new PolylinesController(methodChannel);
-
     this.onibusMarkerClick = new OnibusMarkerClick();
+    this.mapStyle = defaultMapaStyle();
+  }
+
+  private String defaultMapaStyle() {
+    String result = "[]";
+    try {
+      StringBuilder sb = new StringBuilder();
+      AssetManager assetManager = registrar.context().getAssets();
+      String key = registrar.lookupKeyForAsset("assets/mapStyle/light2.json");
+      InputStream is =assetManager.open(key);
+      BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+      String str;
+      while ((str = br.readLine()) != null) {
+        sb.append(str);
+      }
+      result = sb.toString();
+      br.close();
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    return result;
   }
 
   @Override
@@ -184,7 +213,9 @@ final class GoogleMapController
     googleMap.getUiSettings().setCompassEnabled(false);
     googleMap.getUiSettings().setIndoorLevelPickerEnabled(false);
     googleMap.getUiSettings().setMapToolbarEnabled(false);
-    googleMap.setMapStyle(new MapStyleOptions(mapStyle));
+
+    if(mapStyle != null && !mapStyle.isEmpty())
+      googleMap.setMapStyle(new MapStyleOptions(mapStyle));
 
   }
 
@@ -439,7 +470,7 @@ final class GoogleMapController
 
   @Override
   public void setMapStyle(String mapStyle) {
-    if (mapStyle == null || this.mapStyle.equals(mapStyle)) {
+    if (mapStyle == null || this.mapStyle.equals(mapStyle) || mapStyle.isEmpty()) {
       return;
     }
     this.mapStyle = mapStyle;
