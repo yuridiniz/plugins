@@ -66,6 +66,7 @@ final class GoogleMapController
   private final MethodChannel methodChannel;
   private final PluginRegistry.Registrar registrar;
   private final MapView mapView;
+  private OnibusMarkerClick onibusMarkerClick;
   private GoogleMap googleMap;
   private boolean trackCameraPosition = false;
   private boolean myLocationEnabled = false;
@@ -76,14 +77,11 @@ final class GoogleMapController
   private MethodChannel.Result mapReadyResult;
   private final int registrarActivityHashCode;
   private final Context context;
-
   private final MarkersController markersController;
   private final PolylinesController polylinesController;
   private List<Object> initialMarkers;
-  private String mapStyle = "";
   private List<Object> initialPolylines;
-
-  private OnibusMarkerClick onibusMarkerClick;
+  private String mapStyle = "";
 
   GoogleMapController(
       int id,
@@ -296,6 +294,11 @@ final class GoogleMapController
           result.success(googleMap.getUiSettings().isMyLocationButtonEnabled());
           break;
         }
+      case "map#toggleMapStyle":
+        {
+          result.success(mapStyle);
+          break;
+        }
       default:
         result.notImplemented();
     }
@@ -436,7 +439,7 @@ final class GoogleMapController
 
   @Override
   public void setMapStyle(String mapStyle) {
-    if (this.mapStyle.equals(mapStyle)) {
+    if (mapStyle == null || this.mapStyle.equals(mapStyle)) {
       return;
     }
     this.mapStyle = mapStyle;

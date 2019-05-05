@@ -18,8 +18,8 @@ class GoogleMapBuilder implements GoogleMapOptionsSink {
   private boolean trafficEnabled = false;
   private boolean myLocationButtonEnabled = false;
   private Object initialMarkers;
-  private String mapStyle = "";
   private Object initialPolylines;
+  private String mapStyle;
 
   GoogleMapController build(
       int id, Context context, AtomicInteger state, PluginRegistry.Registrar registrar) {
@@ -30,8 +30,8 @@ class GoogleMapBuilder implements GoogleMapOptionsSink {
     controller.setMyLocationButtonEnabled(myLocationButtonEnabled);
     controller.setTrackCameraPosition(trackCameraPosition);
     controller.setInitialMarkers(initialMarkers);
-    controller.setMapStyle(mapStyle);
     controller.setInitialPolylines(initialPolylines);
+    controller.setMapStyle(mapStyle);
     return controller;
   }
 
@@ -56,7 +56,6 @@ class GoogleMapBuilder implements GoogleMapOptionsSink {
 
   @Override
   public void setMapStyle(String mapStyle) {
-    System.out.println(mapStyle);
     this.mapStyle = mapStyle;
   }
 

@@ -50,15 +50,21 @@ class MapUiBodyState extends State<MapUiBody> {
   bool _tiltGesturesEnabled = true;
   bool _zoomGesturesEnabled = true;
   bool _myLocationEnabled = true;
-  String _mapStyle;
   bool _myLocationButtonEnabled = true;
+  bool _defaultMapStyle = true;
+  String _mapStyle = "[]";
+  String _mapStyleNight;
+
+  Future<String> loadMapStyle() async {
+    return await rootBundle.loadString('assets/raw/style_json.json');
+  }
 
   @override
   void initState() {
     super.initState();
     loadMapStyle().then((String style) {
       setState(() {
-        _mapStyle = style;
+        _mapStyleNight = style;
       });
     });
   }
@@ -68,8 +74,20 @@ class MapUiBodyState extends State<MapUiBody> {
     super.dispose();
   }
 
-  Future<String> loadMapStyle() async {
-    return await rootBundle.loadString('assets/raw/style_json.json');
+  Widget _toggleMapStyle() {
+    return FlatButton(
+      child: Text('change to ${_defaultMapStyle ? 'night' : 'default'} style'),
+      onPressed: () {
+        setState(() {
+          if (_defaultMapStyle) {
+            _mapStyle = _mapStyleNight;
+          } else {
+            _mapStyle = '[]';
+          }
+          _defaultMapStyle = !_defaultMapStyle;
+        });
+      },
+    );
   }
 
   Widget _compassToggler() {
@@ -209,7 +227,6 @@ class MapUiBodyState extends State<MapUiBody> {
       tiltGesturesEnabled: _tiltGesturesEnabled,
       zoomGesturesEnabled: _zoomGesturesEnabled,
       myLocationEnabled: _myLocationEnabled,
-      myLocationButtonEnabled: _myLocationButtonEnabled,
       onCameraMove: _updateCameraPosition,
       mapStyle: _mapStyle,
     );
@@ -239,6 +256,7 @@ class MapUiBodyState extends State<MapUiBody> {
               Text('camera zoom: ${_position.zoom}'),
               Text('camera tilt: ${_position.tilt}'),
               Text(_isMoving ? '(Camera moving)' : '(Camera idle)'),
+              _toggleMapStyle(),
               _compassToggler(),
               _latLngBoundsToggler(),
               _mapTypeCycler(),
