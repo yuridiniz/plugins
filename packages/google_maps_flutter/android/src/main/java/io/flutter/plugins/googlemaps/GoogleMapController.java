@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -46,6 +47,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -101,6 +103,10 @@ final class GoogleMapController
     this.activityState = activityState;
     this.registrar = registrar;
     this.mapView = new MapView(context, options);
+    if (needDisableHardwareAcceleration()) {
+      this.mapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+    }
+
     this.density = context.getResources().getDisplayMetrics().density;
     methodChannel =
         new MethodChannel(registrar.messenger(), "plugins.flutter.io/google_maps_" + id);
@@ -109,12 +115,48 @@ final class GoogleMapController
     this.markersController = new MarkersController(methodChannel);
     this.polylinesController = new PolylinesController(methodChannel);
     this.onibusMarkerClick = new OnibusMarkerClick();
-    this.mapStyle = defaultMapaStyle();
+  }
+
+  private boolean needDisableHardwareAcceleration() {
+    List<Devices> devices = Arrays.asList(
+            new Devices("dreamlte", Build.VERSION_CODES.O),
+            new Devices("sanders_nt", Build.VERSION_CODES.O_MR1),
+            new Devices("j4primelte", Build.VERSION_CODES.O_MR1), //2
+            new Devices("ASUS_X00QD", Build.VERSION_CODES.P),
+            new Devices("tulip", Build.VERSION_CODES.P),
+            new Devices("tulip", Build.VERSION_CODES.O_MR1),
+            new Devices("j7elte", Build.VERSION_CODES.M), //Dispositivo desligando
+            new Devices("titan_udstv", Build.VERSION_CODES.M), // Dispositivo desligando
+            new Devices("titan_umtsds", Build.VERSION_CODES.M), // Comportamento estranho
+            new Devices("beryllium", Build.VERSION_CODES.P),
+            new Devices("dipper", Build.VERSION_CODES.P),
+            new Devices("on5xelte", Build.VERSION_CODES.O),
+            new Devices("rosy", Build.VERSION_CODES.O_MR1),
+            new Devices("potter_nt", Build.VERSION_CODES.O_MR1),
+            new Devices("cedric", Build.VERSION_CODES.O_MR1),
+            new Devices("j4corelte", Build.VERSION_CODES.O_MR1),
+            new Devices("pettyl", Build.VERSION_CODES.O_MR1),
+            new Devices("athene_f", Build.VERSION_CODES.O_MR1),
+            new Devices("j2corelte", Build.VERSION_CODES.O_MR1),
+            new Devices("ASUS_X018_4", Build.VERSION_CODES.N),
+            new Devices("montana", Build.VERSION_CODES.N), //Nao sei qual problema, pode ter sido bug de versoes anteriores
+            new Devices("lake_n", Build.VERSION_CODES.P));
+
+      Devices currentDevice = new Devices(Build.DEVICE, Build.VERSION.SDK_INT);
+      currentDevice.setProduct(Build.PRODUCT);
+
+      for (Devices _device: devices) {
+          if(_device.equals(currentDevice))
+              return true;
+      }
+
+      return false;
   }
 
   private String defaultMapaStyle() {
     String result = "[]";
     try {
+
       StringBuilder sb = new StringBuilder();
       AssetManager assetManager = registrar.context().getAssets();
       String key = registrar.lookupKeyForAsset("assets/mapStyle/light2.json");
@@ -214,9 +256,11 @@ final class GoogleMapController
     googleMap.getUiSettings().setIndoorLevelPickerEnabled(false);
     googleMap.getUiSettings().setMapToolbarEnabled(false);
 
-    if(mapStyle != null && !mapStyle.isEmpty())
-      googleMap.setMapStyle(new MapStyleOptions(mapStyle));
+    if(mapStyle == null || mapStyle.isEmpty()) {
+      this.mapStyle = defaultMapaStyle();
+    }
 
+    googleMap.setMapStyle(new MapStyleOptions(mapStyle));
   }
 
   @Override
