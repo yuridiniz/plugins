@@ -15,14 +15,21 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+
+import androidx.core.app.ActivityCompat;
+
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
@@ -618,6 +625,9 @@ final class GoogleMapController
 
   @SuppressLint("MissingPermission")
   private void updateMyLocationSettings() {
+    if(googleMap == null)
+      return;
+
     if (hasLocationPermission()) {
       // The plugin doesn't add the location permission by default so that apps that don't need
       // the feature won't require the permission.
@@ -627,10 +637,37 @@ final class GoogleMapController
       googleMap.setMyLocationEnabled(myLocationEnabled);
       googleMap.getUiSettings().setMyLocationButtonEnabled(myLocationButtonEnabled);
     } else {
+      retrySetPosition(10, 1);
       // TODO(amirh): Make the options update fail.
       // https://github.com/flutter/flutter/issues/24327
       Log.e(TAG, "Cannot enable MyLocation layer as location permissions are not granted");
     }
+  }
+
+  @SuppressLint("MissingPermission")
+  private void retrySetPosition(final int limit, final int times) {
+    if(times > limit)
+      return;
+
+    int secs = 1500;
+    if(times == limit)
+      secs = 15000;
+
+    new Handler().postDelayed(new Runnable() {
+      @Override
+      public void run() {
+
+        if (hasLocationPermission()) {
+          googleMap.setMyLocationEnabled(false);
+          googleMap.setMyLocationEnabled(myLocationEnabled);
+          googleMap.getUiSettings().setMyLocationButtonEnabled(myLocationButtonEnabled);
+
+        } else {
+          retrySetPosition(limit, times + 1);
+        }
+
+      }
+    }, secs);
   }
 
   private boolean hasLocationPermission() {
