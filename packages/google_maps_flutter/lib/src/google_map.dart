@@ -172,8 +172,6 @@ class GoogleMap extends StatefulWidget {
   ///
   ///
   ///
-  final String mapStyle;
-
   final bool trafficEnabled;
   
   /// Enables or disables the my-location button.
@@ -414,7 +412,6 @@ class _GoogleMapOptions {
       trackCameraPosition: map.onCameraMove != null,
       zoomGesturesEnabled: map.zoomGesturesEnabled,
       myLocationEnabled: map.myLocationEnabled,
-      mapStyle: map.mapStyle,
       trafficEnabled: map.trafficEnabled,
       myLocationButtonEnabled: map.myLocationButtonEnabled,
     );

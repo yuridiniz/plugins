@@ -485,7 +485,7 @@ final class GoogleMapController
 
   @Override
   public boolean onMarkerClick(Marker marker) {
-    return onibusMarkerClick.onMarkerClick(marker)
+    return onibusMarkerClick.onMarkerClick(marker);
 
     // Comentado para poder customizar o evento de click e não assumir o default do Plugin Flutter
     // return markersController.onMarkerTap(marker.getId());
@@ -594,16 +594,17 @@ final class GoogleMapController
     googleMap.setMapType(mapType);
   }
 
-  @Override
-  public void setMapStyle(String mapStyle) {
-    if (mapStyle == null || this.mapStyle.equals(mapStyle) || mapStyle.isEmpty()) {
-      return;
-    }
-    this.mapStyle = mapStyle;
-    if (googleMap != null) {
-      googleMap.setMapStyle(new MapStyleOptions(mapStyle));
-    }
-  }
+  // TODO REMOVER
+  // @Override
+  // public void setMapStyle(String mapStyle) {
+  //   if (mapStyle == null || this.mapStyle.equals(mapStyle) || mapStyle.isEmpty()) {
+  //     return;
+  //   }
+  //   this.mapStyle = mapStyle;
+  //   if (googleMap != null) {
+  //     googleMap.setMapStyle(new MapStyleOptions(mapStyle));
+  //   }
+  // }
 
   @Override
   public void setTrackCameraPosition(boolean trackCameraPosition) {

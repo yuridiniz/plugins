@@ -56,10 +56,11 @@ class GoogleMapBuilder implements GoogleMapOptionsSink {
     options.mapType(mapType);
   }
 
-  @Override
-  public void setMapStyle(String mapStyle) {
-    this.mapStyle = mapStyle;
-  }
+  // TODO REMOVER
+  // @Override
+  // public void setMapStyle(String mapStyle) {
+  //   this.mapStyle = mapStyle;
+  // }
 
   @Override
   public void setMinMaxZoomPreference(Float min, Float max) {
