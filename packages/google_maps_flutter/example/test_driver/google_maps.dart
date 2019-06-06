@@ -292,7 +292,7 @@ void main() {
     // still being investigated.
     // TODO(cyanglaz): Remove this temporary fix once the Maps SDK issue is resolved.
     // https://github.com/flutter/flutter/issues/27550
-    await Future<dynamic>.delayed(Duration(seconds: 3));
+    await Future<dynamic>.delayed(const Duration(seconds: 3));
 
     final LatLngBounds firstVisibleRegion =
         await mapController.getVisibleRegion();
@@ -376,5 +376,74 @@ void main() {
 
     _style = await inspector.toggleMapStyle();
     expect(_style, equals(_mapStyle));
+  });
+
+  test('testSetMapStyle valid Json String', () async {
+    final Key key = GlobalKey();
+    final Completer<GoogleMapController> controllerCompleter =
+        Completer<GoogleMapController>();
+
+    await pumpWidget(Directionality(
+      textDirection: TextDirection.ltr,
+      child: GoogleMap(
+        key: key,
+        initialCameraPosition: _kInitialCameraPosition,
+        onMapCreated: (GoogleMapController controller) {
+          controllerCompleter.complete(controller);
+        },
+      ),
+    ));
+
+    final GoogleMapController controller = await controllerCompleter.future;
+    final String mapStyle =
+        '[{"elementType":"geometry","stylers":[{"color":"#242f3e"}]}]';
+    await controller.setMapStyle(mapStyle);
+  });
+
+  test('testSetMapStyle invalid Json String', () async {
+    final Key key = GlobalKey();
+    final Completer<GoogleMapController> controllerCompleter =
+        Completer<GoogleMapController>();
+
+    await pumpWidget(Directionality(
+      textDirection: TextDirection.ltr,
+      child: GoogleMap(
+        key: key,
+        initialCameraPosition: _kInitialCameraPosition,
+        onMapCreated: (GoogleMapController controller) {
+          controllerCompleter.complete(controller);
+        },
+      ),
+    ));
+
+    final GoogleMapController controller = await controllerCompleter.future;
+
+    try {
+      await controller.setMapStyle('invalid_value');
+      fail('expected MapStyleException');
+    } on MapStyleException catch (e) {
+      expect(e.cause,
+          'The data couldn’t be read because it isn’t in the correct format.');
+    }
+  });
+
+  test('testSetMapStyle null string', () async {
+    final Key key = GlobalKey();
+    final Completer<GoogleMapController> controllerCompleter =
+        Completer<GoogleMapController>();
+
+    await pumpWidget(Directionality(
+      textDirection: TextDirection.ltr,
+      child: GoogleMap(
+        key: key,
+        initialCameraPosition: _kInitialCameraPosition,
+        onMapCreated: (GoogleMapController controller) {
+          controllerCompleter.complete(controller);
+        },
+      ),
+    ));
+
+    final GoogleMapController controller = await controllerCompleter.future;
+    await controller.setMapStyle(null);
   });
 }

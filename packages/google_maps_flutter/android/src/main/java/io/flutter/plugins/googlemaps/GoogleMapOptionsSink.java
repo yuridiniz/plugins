@@ -34,7 +34,11 @@ interface GoogleMapOptionsSink {
 
   void setInitialMarkers(Object initialMarkers);
 
+  void setInitialPolygons(Object initialPolygons);
+
   void setInitialPolylines(Object initialPolylines);
 
   void setTrafficEnabled(boolean toBoolean);
+  
+  void setInitialCircles(Object initialCircles);
 }
