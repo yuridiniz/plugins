@@ -156,6 +156,7 @@ final class GoogleMapController
             new Devices("athene_f", Build.VERSION_CODES.O_MR1),
             new Devices("j2corelte", Build.VERSION_CODES.O_MR1),
             new Devices("ASUS_X018_4", Build.VERSION_CODES.N),
+            new Devices("j1x3g", Build.VERSION_CODES.LOLLIPOP_MR1),
             new Devices("montana", Build.VERSION_CODES.N), //Nao sei qual problema, pode ter sido bug de versoes anteriores
             new Devices("lake_n", Build.VERSION_CODES.P));
 
@@ -168,29 +169,6 @@ final class GoogleMapController
       }
 
       return false;
-  }
-
-  private String defaultMapaStyle() {
-    String result = "[]";
-    try {
-
-      StringBuilder sb = new StringBuilder();
-      AssetManager assetManager = registrar.context().getAssets();
-      String key = registrar.lookupKeyForAsset("assets/mapStyle/light2.json");
-      InputStream is =assetManager.open(key);
-      BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-      String str;
-      while ((str = br.readLine()) != null) {
-        sb.append(str);
-      }
-      result = sb.toString();
-      br.close();
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    return result;
   }
 
   @Override
