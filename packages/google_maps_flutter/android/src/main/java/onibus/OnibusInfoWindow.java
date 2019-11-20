@@ -21,12 +21,14 @@ import com.google.android.gms.maps.model.Marker;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import io.flutter.plugins.googlemaps.R;
 
@@ -62,10 +64,10 @@ public class OnibusInfoWindow implements GoogleMap.InfoWindowAdapter {
     public View getInfoWindow(Marker marker) {
         try {
             JSONObject jsonObject = new JSONObject(marker.getSnippet());
-            Calendar calendar = Calendar.getInstance();
-            long dateDiff = calendar.getTimeInMillis() - jsonObject.getLong("D");
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+            long dateDiff = calendar.getTimeInMillis() - jsonObject.getLong("U");
 
-            calendar.setTimeInMillis(946692000000L); //2000-01-01 00:00:00
+            calendar.setTimeInMillis(946684800000L); //2000-01-01 00:00:00
             calendar.add(Calendar.MILLISECOND, (int) dateDiff);
 
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

@@ -205,9 +205,21 @@ class Convert {
     return Arrays.asList(latLng.latitude, latLng.longitude);
   }
 
-  private static LatLng toLatLng(Object o) {
+  static LatLng toLatLng(Object o) {
     final List<?> data = toList(o);
     return new LatLng(toDouble(data.get(0)), toDouble(data.get(1)));
+  }
+
+  static Point toPoint(Object o) {
+    Map<String, Integer> screenCoordinate = (Map<String, Integer>) o;
+    return new Point(screenCoordinate.get("x"), screenCoordinate.get("y"));
+  }
+
+  static Map<String, Integer> pointToJson(Point point) {
+    final Map<String, Integer> data = new HashMap<>(2);
+    data.put("x", point.x);
+    data.put("y", point.y);
+    return data;
   }
 
   private static LatLngBounds toLatLngBounds(Object o) {
@@ -264,6 +276,10 @@ class Convert {
     if (compassEnabled != null) {
       sink.setCompassEnabled(toBoolean(compassEnabled));
     }
+    final Object mapToolbarEnabled = data.get("mapToolbarEnabled");
+    if (mapToolbarEnabled != null) {
+      sink.setMapToolbarEnabled(toBoolean(mapToolbarEnabled));
+    }
     final Object mapType = data.get("mapType");
     if (mapType != null) {
       sink.setMapType(toInt(mapType));
@@ -278,6 +294,15 @@ class Convert {
       sink.setMinMaxZoomPreference( //
           toFloatWrapper(zoomPreferenceData.get(0)), //
           toFloatWrapper(zoomPreferenceData.get(1)));
+    }
+    final Object padding = data.get("padding");
+    if (padding != null) {
+      final List<?> paddingData = toList(padding);
+      sink.setPadding(
+          toFloat(paddingData.get(0)),
+          toFloat(paddingData.get(1)),
+          toFloat(paddingData.get(2)),
+          toFloat(paddingData.get(3)));
     }
     final Object rotateGesturesEnabled = data.get("rotateGesturesEnabled");
     if (rotateGesturesEnabled != null) {
@@ -303,13 +328,17 @@ class Convert {
     if (myLocationEnabled != null) {
       sink.setMyLocationEnabled(toBoolean(myLocationEnabled));
     }
-    final Object trafficEnabled = data.get("trafficEnabled");
-    if (trafficEnabled != null) {
-      sink.setTrafficEnabled(toBoolean(trafficEnabled));
-    }
     final Object myLocationButtonEnabled = data.get("myLocationButtonEnabled");
     if (myLocationButtonEnabled != null) {
       sink.setMyLocationButtonEnabled(toBoolean(myLocationButtonEnabled));
+    }
+    final Object indoorEnabled = data.get("indoorEnabled");
+    if (indoorEnabled != null) {
+      sink.setIndoorEnabled(toBoolean(indoorEnabled));
+    }
+    final Object trafficEnabled = data.get("trafficEnabled");
+    if (trafficEnabled != null) {
+      sink.setTrafficEnabled(toBoolean(trafficEnabled));
     }
   }
 

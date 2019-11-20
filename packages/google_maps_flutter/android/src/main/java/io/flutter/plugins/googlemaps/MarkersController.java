@@ -79,6 +79,17 @@ class MarkersController {
     return false;
   }
 
+  void onMarkerDragEnd(String googleMarkerId, LatLng latLng) {
+    String markerId = googleMapsMarkerIdToDartMarkerId.get(googleMarkerId);
+    if (markerId == null) {
+      return;
+    }
+    final Map<String, Object> data = new HashMap<>();
+    data.put("markerId", markerId);
+    data.put("position", Convert.latLngToJson(latLng));
+    methodChannel.invokeMethod("marker#onDragEnd", data);
+  }
+
   void onInfoWindowTap(String googleMarkerId) {
     String markerId = googleMapsMarkerIdToDartMarkerId.get(googleMarkerId);
     if (markerId == null) {

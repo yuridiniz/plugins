@@ -8,7 +8,9 @@
 #pragma mark - Conversion of JSON-like values sent via platform channels. Forward declarations.
 
 static NSDictionary* PositionToJson(GMSCameraPosition* position);
+static NSDictionary* PointToJson(CGPoint point);
 static NSArray* LocationToJson(CLLocationCoordinate2D position);
+static CGPoint ToCGPoint(NSDictionary* json);
 static GMSCameraPosition* ToOptionalCameraPosition(NSDictionary* json);
 static GMSCoordinateBounds* ToOptionalBounds(NSArray* json);
 static GMSCameraUpdate* ToCameraUpdate(NSArray* data);
@@ -100,7 +102,7 @@ static double ToDouble(NSNumber* data) { return [FLTGoogleMapJsonConversions toD
     if ([markersToAdd isKindOfClass:[NSArray class]]) {
       [_markersController addMarkers:markersToAdd];
     }
-    id polygonsToAdd = args[@"polygonToAdd"];
+    id polygonsToAdd = args[@"polygonsToAdd"];
     if ([polygonsToAdd isKindOfClass:[NSArray class]]) {
       [_polygonsController addPolygons:polygonsToAdd];
     }
@@ -145,6 +147,26 @@ static double ToDouble(NSNumber* data) { return [FLTGoogleMapJsonConversions toD
     } else {
       result([FlutterError errorWithCode:@"GoogleMap uninitialized"
                                  message:@"getVisibleRegion called prior to map initialization"
+                                 details:nil]);
+    }
+  } else if ([call.method isEqualToString:@"map#getScreenCoordinate"]) {
+    if (_mapView != nil) {
+      CLLocationCoordinate2D location = [FLTGoogleMapJsonConversions toLocation:call.arguments];
+      CGPoint point = [_mapView.projection pointForCoordinate:location];
+      result(PointToJson(point));
+    } else {
+      result([FlutterError errorWithCode:@"GoogleMap uninitialized"
+                                 message:@"getScreenCoordinate called prior to map initialization"
+                                 details:nil]);
+    }
+  } else if ([call.method isEqualToString:@"map#getLatLng"]) {
+    if (_mapView != nil && call.arguments) {
+      CGPoint point = ToCGPoint(call.arguments);
+      CLLocationCoordinate2D latlng = [_mapView.projection coordinateForPoint:point];
+      result(LocationToJson(latlng));
+    } else {
+      result([FlutterError errorWithCode:@"GoogleMap uninitialized"
+                                 message:@"getLatLng called prior to map initialization"
                                  details:nil]);
     }
   } else if ([call.method isEqualToString:@"map#waitForMap"]) {
@@ -208,6 +230,9 @@ static double ToDouble(NSNumber* data) { return [FLTGoogleMapJsonConversions toD
   } else if ([call.method isEqualToString:@"map#isCompassEnabled"]) {
     NSNumber* isCompassEnabled = @(_mapView.settings.compassButton);
     result(isCompassEnabled);
+  } else if ([call.method isEqualToString:@"map#isMapToolbarEnabled"]) {
+    NSNumber* isMapToolbarEnabled = [NSNumber numberWithBool:NO];
+    result(isMapToolbarEnabled);
   } else if ([call.method isEqualToString:@"map#getMinMaxZoomLevels"]) {
     NSArray* zoomLevels = @[ @(_mapView.minZoom), @(_mapView.maxZoom) ];
     result(zoomLevels);
@@ -226,6 +251,9 @@ static double ToDouble(NSNumber* data) { return [FLTGoogleMapJsonConversions toD
   } else if ([call.method isEqualToString:@"map#isMyLocationButtonEnabled"]) {
     NSNumber* isMyLocationButtonEnabled = @(_mapView.settings.myLocationButton);
     result(isMyLocationButtonEnabled);
+  } else if ([call.method isEqualToString:@"map#isTrafficEnabled"]) {
+    NSNumber* isTrafficEnabled = @(_mapView.trafficEnabled);
+    result(isTrafficEnabled);
   } else if ([call.method isEqualToString:@"map#setStyle"]) {
     NSString* mapStyle = [call arguments];
     NSString* error = [self setMapStyle:mapStyle];
@@ -279,12 +307,24 @@ static double ToDouble(NSNumber* data) { return [FLTGoogleMapJsonConversions toD
   _mapView.settings.compassButton = enabled;
 }
 
+- (void)setIndoorEnabled:(BOOL)enabled {
+  _mapView.indoorEnabled = enabled;
+}
+
+- (void)setTrafficEnabled:(BOOL)enabled {
+  _mapView.trafficEnabled = enabled;
+}
+
 - (void)setMapType:(GMSMapViewType)mapType {
   _mapView.mapType = mapType;
 }
 
 - (void)setMinZoom:(float)minZoom maxZoom:(float)maxZoom {
   [_mapView setMinZoom:minZoom maxZoom:maxZoom];
+}
+
+- (void)setPaddingTop:(float)top left:(float)left bottom:(float)bottom right:(float)right {
+  _mapView.padding = UIEdgeInsetsMake(top, left, bottom, right);
 }
 
 - (void)setRotateGesturesEnabled:(BOOL)enabled {
@@ -309,7 +349,6 @@ static double ToDouble(NSNumber* data) { return [FLTGoogleMapJsonConversions toD
 
 - (void)setMyLocationEnabled:(BOOL)enabled {
   _mapView.myLocationEnabled = enabled;
-  _mapView.settings.myLocationButton = enabled;
 }
 
 - (void)setMapStyle:(NSString*)mapStyle {
@@ -371,6 +410,11 @@ static double ToDouble(NSNumber* data) { return [FLTGoogleMapJsonConversions toD
   return [_markersController onMarkerTap:markerId];
 }
 
+- (void)mapView:(GMSMapView*)mapView didEndDraggingMarker:(GMSMarker*)marker {
+  NSString* markerId = marker.userData[0];
+  [_markersController onMarkerDragEnd:markerId coordinate:marker.position];
+}
+
 - (void)mapView:(GMSMapView*)mapView didTapInfoWindowOfMarker:(GMSMarker*)marker {
   NSString* markerId = marker.userData[0];
   [_markersController onInfoWindowTap:markerId];
@@ -414,6 +458,13 @@ static NSDictionary* PositionToJson(GMSCameraPosition* position) {
   };
 }
 
+static NSDictionary* PointToJson(CGPoint point) {
+  return @{
+    @"x" : @((int)point.x),
+    @"y" : @((int)point.y),
+  };
+}
+
 static NSDictionary* GMSCoordinateBoundsToJson(GMSCoordinateBounds* bounds) {
   if (!bounds) {
     return nil;
@@ -445,6 +496,12 @@ static GMSCameraPosition* ToCameraPosition(NSDictionary* data) {
 
 static GMSCameraPosition* ToOptionalCameraPosition(NSDictionary* json) {
   return json ? ToCameraPosition(json) : nil;
+}
+
+static CGPoint ToCGPoint(NSDictionary* json) {
+  double x = ToDouble(json[@"x"]);
+  double y = ToDouble(json[@"y"]);
+  return CGPointMake(x, y);
 }
 
 static GMSCoordinateBounds* ToBounds(NSArray* data) {
@@ -498,7 +555,15 @@ static void InterpretMapOptions(NSDictionary* data, id<FLTGoogleMapOptionsSink> 
   if (compassEnabled) {
     [sink setCompassEnabled:ToBool(compassEnabled)];
   }
-  NSNumber* mapType = data[@"mapType"];
+  id indoorEnabled = data[@"indoorEnabled"];
+  if (indoorEnabled) {
+    [sink setIndoorEnabled:ToBool(indoorEnabled)];
+  }
+  id trafficEnabled = data[@"trafficEnabled"];
+  if (trafficEnabled) {
+    [sink setTrafficEnabled:ToBool(trafficEnabled)];
+  }
+  id mapType = data[@"mapType"];
   if (mapType) {
     [sink setMapType:ToMapViewType(mapType)];
   }
@@ -508,6 +573,15 @@ static void InterpretMapOptions(NSDictionary* data, id<FLTGoogleMapOptionsSink> 
     float maxZoom = (zoomData[1] == [NSNull null]) ? kGMSMaxZoomLevel : ToFloat(zoomData[1]);
     [sink setMinZoom:minZoom maxZoom:maxZoom];
   }
+  NSArray* paddingData = data[@"padding"];
+  if (paddingData) {
+    float top = (paddingData[0] == [NSNull null]) ? 0 : ToFloat(paddingData[0]);
+    float left = (paddingData[1] == [NSNull null]) ? 0 : ToFloat(paddingData[1]);
+    float bottom = (paddingData[2] == [NSNull null]) ? 0 : ToFloat(paddingData[2]);
+    float right = (paddingData[3] == [NSNull null]) ? 0 : ToFloat(paddingData[3]);
+    [sink setPaddingTop:top left:left bottom:bottom right:right];
+  }
+
   NSNumber* rotateGesturesEnabled = data[@"rotateGesturesEnabled"];
   if (rotateGesturesEnabled) {
     [sink setRotateGesturesEnabled:ToBool(rotateGesturesEnabled)];

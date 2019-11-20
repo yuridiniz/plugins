@@ -5,10 +5,11 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart' show TestWidgetsFlutterBinding;
 import 'package:in_app_purchase/src/in_app_purchase/purchase_details.dart';
 import 'package:test/test.dart';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart' hide TypeMatcher;
 import 'package:in_app_purchase/billing_client_wrappers.dart';
 import 'package:in_app_purchase/src/billing_client_wrappers/enum_converters.dart';
 import 'package:in_app_purchase/src/in_app_purchase/google_play_connection.dart';
@@ -20,6 +21,8 @@ import '../billing_client_wrappers/sku_details_wrapper_test.dart';
 import '../billing_client_wrappers/purchase_wrapper_test.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   final StubInAppPurchasePlatform stubPlatform = StubInAppPurchasePlatform();
   GooglePlayConnection connection;
   const String startConnectionCall =
@@ -144,7 +147,7 @@ void main() {
           await connection.queryProductDetails(<String>['invalid'].toSet());
       expect(response.notFoundIDs, ['invalid']);
       expect(response.productDetails, isEmpty);
-      expect(response.error.source, PurchaseSource.GooglePlay);
+      expect(response.error.source, IAPSource.GooglePlay);
       expect(response.error.code, 'error_code');
       expect(response.error.message, 'error_message');
       expect(response.error.details, {'info': 'error_info'});
@@ -163,7 +166,7 @@ void main() {
           await connection.queryPastPurchases();
       expect(response.pastPurchases, isEmpty);
       expect(response.error.message, BillingResponse.developerError.toString());
-      expect(response.error.source, PurchaseSource.GooglePlay);
+      expect(response.error.source, IAPSource.GooglePlay);
     });
 
     test('returns SkuDetailsResponseWrapper', () async {
@@ -301,7 +304,7 @@ void main() {
       PurchaseDetails result = await completer.future;
 
       expect(result.error, isNotNull);
-      expect(result.error.source, PurchaseSource.GooglePlay);
+      expect(result.error.source, IAPSource.GooglePlay);
       expect(result.status, PurchaseStatus.error);
       expect(result.purchaseID, isNull);
     });

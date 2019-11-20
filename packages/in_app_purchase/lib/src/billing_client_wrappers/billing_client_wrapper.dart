@@ -192,10 +192,10 @@ class BillingClient {
   /// listener)`](https://developer.android.com/reference/com/android/billingclient/api/BillingClient#querypurchasehistoryasync).
   Future<PurchasesResultWrapper> queryPurchaseHistory(SkuType skuType) async {
     assert(skuType != null);
-    return PurchasesResultWrapper.fromJson(await channel
-        .invokeMapMethod<String, dynamic>(
-            'BillingClient#queryPurchaseHistoryAsync(String, PurchaseHistoryResponseListener)',
-            <String, dynamic>{'skuType': SkuTypeConverter().toJson(skuType)}));
+    return PurchasesResultWrapper.fromJson(await channel.invokeMapMethod<String,
+            dynamic>(
+        'BillingClient#queryPurchaseHistoryAsync(String, PurchaseHistoryResponseListener)',
+        <String, dynamic>{'skuType': SkuTypeConverter().toJson(skuType)}));
   }
 
   /// Consumes a given in-app product.
@@ -220,7 +220,8 @@ class BillingClient {
         assert(_callbacks[kOnPurchasesUpdated].length == 1);
         final PurchasesUpdatedListener listener =
             _callbacks[kOnPurchasesUpdated].first;
-        listener(PurchasesResultWrapper.fromJson(call.arguments));
+        listener(PurchasesResultWrapper.fromJson(
+            call.arguments.cast<String, dynamic>()));
         break;
       case _kOnBillingServiceDisconnected:
         final int handle = call.arguments['handle'];

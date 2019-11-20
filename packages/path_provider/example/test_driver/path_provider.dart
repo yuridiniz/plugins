@@ -36,8 +36,18 @@ void main() {
   });
 
   test('getApplicationSupportDirectory', () async {
+    final Directory result = await getApplicationSupportDirectory();
+    final String uuid = Uuid().v1();
+    final File file = File('${result.path}/$uuid.txt');
+    file.writeAsStringSync('Hello world!');
+    expect(file.readAsStringSync(), 'Hello world!');
+    expect(result.listSync(), isNotEmpty);
+    file.deleteSync();
+  });
+
+  test('getLibraryDirectory', () async {
     if (Platform.isIOS) {
-      final Directory result = await getApplicationSupportDirectory();
+      final Directory result = await getLibraryDirectory();
       final String uuid = Uuid().v1();
       final File file = File('${result.path}/$uuid.txt');
       file.writeAsStringSync('Hello world!');
@@ -45,7 +55,7 @@ void main() {
       expect(result.listSync(), isNotEmpty);
       file.deleteSync();
     } else if (Platform.isAndroid) {
-      final Future<Directory> result = getApplicationSupportDirectory();
+      final Future<Directory> result = getLibraryDirectory();
       expect(result, throwsA(isInstanceOf<UnsupportedError>()));
     }
   });
@@ -56,9 +66,12 @@ void main() {
       expect(result, throwsA(isInstanceOf<UnsupportedError>()));
     } else if (Platform.isAndroid) {
       final Directory result = await getExternalStorageDirectory();
-      // This directory is not accessible in Android emulators.
-      // However, it should at least have a fake path returned.
-      expect(result.path.length, isNonZero);
+      final String uuid = Uuid().v1();
+      final File file = File('${result.path}/$uuid.txt');
+      file.writeAsStringSync('Hello world!');
+      expect(file.readAsStringSync(), 'Hello world!');
+      expect(result.listSync(), isNotEmpty);
+      file.deleteSync();
     }
   });
 }
